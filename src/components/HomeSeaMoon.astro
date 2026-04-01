@@ -1,15 +1,26 @@
 ---
 import { homeHeroVideoConfig, getHomeHeroVideoCssVars } from '../lib/homeHeroVideo';
+import { withBase } from '../lib/paths';
 import { siteConfig } from '../lib/site';
 
 const rootStyle = Object.entries(getHomeHeroVideoCssVars(homeHeroVideoConfig))
   .map(([key, value]) => `${key}:${value}`)
   .join(';');
+const homeHref = withBase('/');
+const navItems = siteConfig.nav.map((item) => ({
+  ...item,
+  href: withBase(item.href),
+}));
+const videoSrc = withBase(homeHeroVideoConfig.videoSrc);
+const posterStyle = [
+  `background-image:-webkit-image-set(url('${withBase(homeHeroVideoConfig.posterSrc)}') type('image/avif') 1x, url('${withBase(homeHeroVideoConfig.posterFallbackSrc)}') type('image/jpeg') 1x)`,
+  `background-image:image-set(url('${withBase(homeHeroVideoConfig.posterSrc)}') type('image/avif') 1x, url('${withBase(homeHeroVideoConfig.posterFallbackSrc)}') type('image/jpeg') 1x)`,
+].join(';');
 ---
 
 <section class="sea-home" aria-label="首页" data-home-video-hero style={rootStyle}>
   <div class="sea-home__media" aria-hidden="true">
-    <div class="sea-home__poster"></div>
+    <div class="sea-home__poster" style={posterStyle}></div>
 
     <video
       class="sea-home__video"
@@ -21,7 +32,7 @@ const rootStyle = Object.entries(getHomeHeroVideoCssVars(homeHeroVideoConfig))
       disablepictureinpicture
       aria-hidden="true"
     >
-      <source src={homeHeroVideoConfig.videoSrc} type="video/mp4" />
+      <source src={videoSrc} type="video/mp4" />
     </video>
 
     <div class="sea-home__clarity-mask"></div>
@@ -30,14 +41,14 @@ const rootStyle = Object.entries(getHomeHeroVideoCssVars(homeHeroVideoConfig))
   </div>
 
   <div class="sea-home__overlay">
-    <a class="sea-home__brand" href="/" aria-label={siteConfig.title}>
+    <a class="sea-home__brand" href={homeHref} aria-label={siteConfig.title}>
       <span class="sea-home__brand-zh">{siteConfig.title}</span>
       <span class="sea-home__brand-en">{siteConfig.titleEn}</span>
     </a>
 
     <nav class="sea-home__nav" aria-label="Main navigation">
       {
-        siteConfig.nav.map((item) => (
+        navItems.map((item) => (
           <a class="sea-home__nav-link" href={item.href}>
             <span class="sea-home__nav-zh">{item.labelZh}</span>
             <span class="sea-home__nav-en">{item.labelEn}</span>
@@ -124,14 +135,6 @@ const rootStyle = Object.entries(getHomeHeroVideoCssVars(homeHeroVideoConfig))
 
   .sea-home__poster {
     background-color: #04101a;
-    background-image: -webkit-image-set(
-      url('/media/home-moon-poster.avif') type('image/avif') 1x,
-      url('/media/home-moon-poster.jpg') type('image/jpeg') 1x
-    );
-    background-image: image-set(
-      url('/media/home-moon-poster.avif') type('image/avif') 1x,
-      url('/media/home-moon-poster.jpg') type('image/jpeg') 1x
-    );
     background-position: var(--hero-object-position-desktop);
     background-size: cover;
     background-repeat: no-repeat;

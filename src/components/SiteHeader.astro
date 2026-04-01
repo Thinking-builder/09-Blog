@@ -1,14 +1,23 @@
 ---
+import { normalizePathname, stripBase, withBase } from '../lib/paths';
 import { siteConfig } from '../lib/site';
 
-const pathname = Astro.url.pathname;
+const pathname = stripBase(Astro.url.pathname);
 const navId = 'site-nav-panel';
+const homeHref = withBase('/');
+const navItems = siteConfig.nav.map((item) => ({
+  ...item,
+  href: withBase(item.href),
+  isActive:
+    normalizePathname(pathname) === normalizePathname(item.href) ||
+    normalizePathname(pathname).startsWith(`${normalizePathname(item.href)}/`),
+}));
 ---
 
 <header class="site-header">
   <div class="shell site-header__shell">
     <div class="site-header__band">
-      <a class="brand" href="/" aria-label={siteConfig.title}>
+      <a class="brand" href={homeHref} aria-label={siteConfig.title}>
         <span class="brand__mark" aria-hidden="true">
           <svg viewBox="0 0 36 36" role="presentation">
             <path
@@ -47,13 +56,10 @@ const navId = 'site-nav-panel';
         <div class="site-nav__orbit" aria-hidden="true"></div>
         <ul class="nav-list">
           {
-            siteConfig.nav.map((item) => (
+            navItems.map((item) => (
               <li class="nav-item">
                 <a
-                  class:list={[
-                    'nav-link',
-                    (pathname === item.href || pathname.startsWith(`${item.href}/`)) && 'is-active',
-                  ]}
+                  class:list={['nav-link', item.isActive && 'is-active']}
                   href={item.href}
                   aria-label={`${item.labelZh} ${item.labelEn}`}
                 >
@@ -75,13 +81,10 @@ const navId = 'site-nav-panel';
       <nav aria-label="Mobile navigation">
         <ul class="mobile-panel__list">
           {
-            siteConfig.nav.map((item) => (
+            navItems.map((item) => (
               <li>
                 <a
-                  class:list={[
-                    'mobile-panel__link',
-                    (pathname === item.href || pathname.startsWith(`${item.href}/`)) && 'is-active',
-                  ]}
+                  class:list={['mobile-panel__link', item.isActive && 'is-active']}
                   href={item.href}
                   aria-label={`${item.labelZh} ${item.labelEn}`}
                 >

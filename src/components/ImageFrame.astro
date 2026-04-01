@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../lib/paths';
+
 interface Props {
   src: string;
   alt: string;
@@ -6,10 +8,11 @@ interface Props {
 }
 
 const { src, alt, caption } = Astro.props;
+const imageSrc = withBase(src);
 ---
 
 <figure class="image-frame">
-  <img src={src} alt={alt} loading="lazy" />
+  <img src={imageSrc} alt={alt} loading="lazy" />
   {caption && <figcaption>{caption}</figcaption>}
 </figure>
 

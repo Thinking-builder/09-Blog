@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../lib/paths';
+
 interface Action {
   href: string;
   label: string;
@@ -13,6 +15,10 @@ interface Props {
 }
 
 const { eyebrow, title, description, actions = [], note } = Astro.props;
+const actionItems = actions.map((action) => ({
+  ...action,
+  href: withBase(action.href),
+}));
 ---
 
 <section class="hero shell section-block">
@@ -28,7 +34,7 @@ const { eyebrow, title, description, actions = [], note } = Astro.props;
 
       {actions.length > 0 && (
         <nav class="hero__actions" aria-label="Hero entry points">
-          {actions.map((action) => (
+          {actionItems.map((action) => (
             <a class="hero__action-link" href={action.href}>
               {action.label}
             </a>

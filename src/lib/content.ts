@@ -1,4 +1,5 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { withBase } from './paths';
 import { collectionMeta } from './site';
 
 export type ContentCollectionName = keyof typeof collectionMeta;
@@ -77,11 +78,11 @@ export function getEntriesByTag(entries: Entry[], tagSlug: string) {
 }
 
 export function buildCategoryHref(collection: ContentCollectionName, tag: string) {
-  return `/categories?group=${collection}&tag=${slugifyTag(tag)}`;
+  return withBase(`/categories?group=${collection}&tag=${slugifyTag(tag)}`);
 }
 
 export function getEntryHref(entry: Entry) {
-  return `${collectionMeta[entry.collection].path}/${entry.id}`;
+  return withBase(`${collectionMeta[entry.collection].path}/${entry.id}`);
 }
 
 export function estimateReadingTime(text: string) {

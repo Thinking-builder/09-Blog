@@ -1,4 +1,6 @@
 ---
+import { withBase } from '../lib/paths';
+
 interface Props {
   eyebrow?: string;
   title: string;
@@ -8,6 +10,7 @@ interface Props {
 }
 
 const { eyebrow, title, description, actionHref, actionLabel } = Astro.props;
+const resolvedActionHref = actionHref ? withBase(actionHref) : undefined;
 ---
 
 <div class="section-title">
@@ -17,8 +20,8 @@ const { eyebrow, title, description, actionHref, actionLabel } = Astro.props;
     {description && <p class="lede">{description}</p>}
   </div>
 
-  {actionHref && actionLabel && (
-    <a class="button is-ghost" href={actionHref}>
+  {resolvedActionHref && actionLabel && (
+    <a class="button is-ghost" href={resolvedActionHref}>
       {actionLabel}
     </a>
   )}

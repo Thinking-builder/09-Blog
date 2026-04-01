@@ -1,5 +1,6 @@
 ---
 import type { Entry } from '../lib/content';
+import { withBase } from '../lib/paths';
 import { collectionMeta } from '../lib/site';
 import { formatDate, getEntryHref } from '../lib/content';
 import TagList from './TagList.astro';
@@ -10,13 +11,14 @@ interface Props {
 
 const { entry } = Astro.props;
 const meta = collectionMeta[entry.collection];
+const coverSrc = entry.data.cover ? withBase(entry.data.cover) : undefined;
 ---
 
 <article class="featured-card surface card-hover">
   <a class="featured-card__link" href={getEntryHref(entry)}>
-    {entry.data.cover && (
+    {coverSrc && (
       <div class="featured-card__cover">
-        <img src={entry.data.cover} alt="" loading="lazy" />
+        <img src={coverSrc} alt="" loading="lazy" />
       </div>
     )}
 
