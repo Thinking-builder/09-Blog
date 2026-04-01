@@ -29,7 +29,8 @@ jobs:
         run: |
           OWNER="${{ github.repository_owner }}"
           REPO="${{ github.event.repository.name }}"
-          echo "SITE_URL=https://${OWNER}.github.io" >> "$GITHUB_ENV"
+          OWNER_LOWER="$(printf '%s' "$OWNER" | tr '[:upper:]' '[:lower:]')"
+          echo "SITE_URL=https://${OWNER_LOWER}.github.io" >> "$GITHUB_ENV"
           if [ "$REPO" = "${OWNER}.github.io" ]; then
             echo "BASE_PATH=/" >> "$GITHUB_ENV"
           else
