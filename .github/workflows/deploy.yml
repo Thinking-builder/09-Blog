@@ -30,15 +30,26 @@ jobs:
           OWNER="${{ github.repository_owner }}"
           REPO="${{ github.event.repository.name }}"
           OWNER_LOWER="$(printf '%s' "$OWNER" | tr '[:upper:]' '[:lower:]')"
-          echo "SITE_URL=https://${OWNER_LOWER}.github.io" >> "$GITHUB_ENV"
-          if [ "$REPO" = "${OWNER}.github.io" ]; then
+          CUSTOM_DOMAIN="${{ vars.CUSTOM_DOMAIN }}"
+          CUSTOM_DOMAIN_LOWER="$(printf '%s' "$CUSTOM_DOMAIN" | tr '[:upper:]' '[:lower:]')"
+
+          if [ -n "$CUSTOM_DOMAIN_LOWER" ]; then
+            echo "SITE_URL=https://${CUSTOM_DOMAIN_LOWER}" >> "$GITHUB_ENV"
             echo "BASE_PATH=/" >> "$GITHUB_ENV"
           else
-            echo "BASE_PATH=/${REPO}" >> "$GITHUB_ENV"
+            echo "SITE_URL=https://${OWNER_LOWER}.github.io" >> "$GITHUB_ENV"
+            if [ "$REPO" = "${OWNER}.github.io" ]; then
+              echo "BASE_PATH=/" >> "$GITHUB_ENV"
+            else
+              echo "BASE_PATH=/${REPO}" >> "$GITHUB_ENV"
+            fi
           fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
+        with:
+          token: ${{ secrets.PAGES_DEPLOY_TOKEN != '' && secrets.PAGES_DEPLOY_TOKEN || github.token }}
+          enablement: ${{ secrets.PAGES_DEPLOY_TOKEN != '' }}
 
       - name: Build and Deploy
         id: deployment
