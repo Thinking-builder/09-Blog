@@ -1,0 +1,57 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import SectionTitle from '../../components/SectionTitle.astro';
+import { getPublishedEntries } from '../../lib/content';
+import { collectionMeta, siteConfig } from '../../lib/site';
+
+const entries = await getPublishedEntries('blog');
+const meta = collectionMeta.blog;
+const featuredId = entries.find((entry) => entry.data.featured)?.id ?? entries[0]?.id;
+const featuredEntry = entries.find((entry) => entry.id === featuredId);
+const orderedEntries = featuredEntry
+  ? [featuredEntry, ...entries.filter((entry) => entry.id !== featuredId)]
+  : entries;
+---
+
+<BaseLayout title={`${meta.label} · ${siteConfig.title}`} description={meta.description}>
+  <section class="shell section-block list-page">
+    <SectionTitle eyebrow="Collection" title={meta.label} description={meta.description} />
+    <div class="archive-list">
+      {orderedEntries.map((entry, index) => (
+        <PostCard entry={entry} index={index} isFeaturedRow={index === 0} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .list-page {
+    position: relative;
+  }
+
+  .list-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(180deg, rgba(4, 7, 13, 0.3), rgba(4, 7, 13, 0.08)),
+      radial-gradient(circle at 50% 0%, rgba(220, 226, 234, 0.02), transparent 38%);
+    pointer-events: none;
+  }
+
+  .archive-list {
+    position: relative;
+    border-bottom: 1px solid rgba(217, 224, 234, 0.08);
+  }
+
+  .archive-list::before {
+    content: '';
+    position: absolute;
+    inset: -2.5rem 12% auto;
+    height: 6rem;
+    background: radial-gradient(ellipse at center, rgba(225, 231, 240, 0.03), transparent 72%);
+    pointer-events: none;
+  }
+</style>

@@ -1,0 +1,28 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+}
+
+const { src, alt, caption } = Astro.props;
+---
+
+<figure class="image-frame">
+  <img src={src} alt={alt} loading="lazy" />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
+
+<style>
+  .image-frame {
+    margin: 2rem 0;
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    padding: 0.9rem;
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .image-frame img {
+    border-radius: calc(var(--radius-md) - 0.4rem);
+  }
+</style>

@@ -1,0 +1,72 @@
+---
+import { siteConfig } from '../lib/site';
+---
+
+<footer class="site-footer shell section-block compact">
+  <div class="site-footer__inner surface">
+    <div class="stack">
+      <p class="eyebrow">End of the page</p>
+      <p class="site-footer__copy">
+        {siteConfig.title} · {siteConfig.description}
+      </p>
+    </div>
+
+    <div class="site-footer__meta">
+      <div class="site-footer__links">
+        {
+          siteConfig.social.map((item) => (
+            <a href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
+              {item.label}
+            </a>
+          ))
+        }
+      </div>
+      <p class="muted">Built with Astro, Markdown/MDX, and a long attention span.</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer__inner {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 1.5rem;
+    padding: 1.6rem;
+  }
+
+  .site-footer__copy {
+    margin: 0;
+    max-width: 38rem;
+    color: var(--text-secondary);
+  }
+
+  .site-footer__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  .site-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    color: var(--text-secondary);
+    font-family: var(--font-sans-en-display);
+  }
+
+  .site-footer__links a:hover {
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 720px) {
+    .site-footer__inner {
+      grid-template-columns: 1fr;
+    }
+
+    .site-footer__meta {
+      align-items: flex-start;
+    }
+  }
+</style>

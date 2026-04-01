@@ -1,0 +1,158 @@
+---
+interface Action {
+  href: string;
+  label: string;
+}
+
+interface Props {
+  eyebrow?: string;
+  title: string;
+  description: string;
+  actions?: Action[];
+  note?: string;
+}
+
+const { eyebrow, title, description, actions = [], note } = Astro.props;
+---
+
+<section class="hero shell section-block">
+  <div class="hero__panel surface">
+    <div class="hero__visual" aria-hidden="true">
+      <slot />
+    </div>
+
+    <div class="hero__copy">
+      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+      <h1>{title}</h1>
+      <p class="hero__description">{description}</p>
+
+      {actions.length > 0 && (
+        <nav class="hero__actions" aria-label="Hero entry points">
+          {actions.map((action) => (
+            <a class="hero__action-link" href={action.href}>
+              {action.label}
+            </a>
+          ))}
+        </nav>
+      )}
+
+      {note && <p class="hero__note muted">{note}</p>}
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero__panel {
+    position: relative;
+    overflow: hidden;
+    min-height: min(78vh, 46rem);
+    padding: clamp(2rem, 5vw, 4rem);
+    display: flex;
+    align-items: flex-end;
+    isolation: isolate;
+  }
+
+  .hero__panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(6, 10, 20, 0.82) 0%, rgba(6, 10, 20, 0.58) 34%, rgba(6, 10, 20, 0.12) 64%, rgba(6, 10, 20, 0.02) 100%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 22%, rgba(4, 7, 15, 0.32) 100%);
+    z-index: 0;
+  }
+
+  .hero__visual {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .hero__copy {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 32rem);
+    padding-left: 1rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .hero h1 {
+    margin: 0;
+    font-family: var(--font-sans-en-display);
+    font-size: clamp(3rem, 7vw, 5.8rem);
+    line-height: 0.95;
+    letter-spacing: -0.05em;
+  }
+
+  .hero__description {
+    margin: 1.2rem 0 0;
+    color: var(--text-secondary);
+    font-size: clamp(1.02rem, 1.8vw, 1.18rem);
+    line-height: 1.9;
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.35rem;
+    margin-top: 1.6rem;
+  }
+
+  .hero__action-link {
+    position: relative;
+    padding-bottom: 0.3rem;
+    color: var(--text-primary);
+    font-family: var(--font-sans-en-display);
+    font-size: 0.94rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition:
+      color 180ms ease,
+      transform 180ms ease;
+  }
+
+  .hero__action-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(241, 193, 91, 0.82), transparent);
+    transform: scaleX(0.24);
+    transform-origin: left center;
+    transition: transform 180ms ease;
+  }
+
+  .hero__action-link:hover {
+    color: #fffaf0;
+    transform: translateX(4px);
+  }
+
+  .hero__action-link:hover::after {
+    transform: scaleX(1);
+  }
+
+  .hero__note {
+    margin: 1.15rem 0 0;
+    max-width: 25rem;
+    font-size: 0.92rem;
+  }
+
+  @media (max-width: 720px) {
+    .hero__panel {
+      min-height: 32rem;
+      padding: 1.5rem;
+    }
+
+    .hero__panel::before {
+      background:
+        linear-gradient(180deg, rgba(6, 10, 20, 0.64) 0%, rgba(6, 10, 20, 0.4) 28%, rgba(6, 10, 20, 0.7) 100%);
+    }
+
+    .hero__copy {
+      width: 100%;
+      padding-left: 0.8rem;
+    }
+  }
+</style>

@@ -1,0 +1,27 @@
+---
+import { render } from 'astro:content';
+import { mdxComponents } from '../../components/MDXComponents';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostLayout from '../../layouts/PostLayout.astro';
+import { getAdjacentEntries, getPublishedEntries } from '../../lib/content';
+import { siteConfig } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const entries = await getPublishedEntries('essays');
+  return entries.map((entry) => ({ params: { slug: entry.id } }));
+}
+
+const entries = await getPublishedEntries('essays');
+const entry = entries.find((item) => item.id === Astro.params.slug);
+
+if (!entry) {
+  throw new Error(`Essay entry not found: ${Astro.params.slug}`);
+}
+
+const { Content } = await render(entry);
+const { previous, next } = getAdjacentEntries(entries, entry.id);
+---
+
+<BaseLayout title={`${entry.data.title} · ${siteConfig.title}`} description={entry.data.description}>
+  <PostLayout entry={entry} Content={Content} components={mdxComponents} previous={previous} next={next} />
+</BaseLayout>

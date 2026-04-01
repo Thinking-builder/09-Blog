@@ -1,0 +1,134 @@
+---
+import GiscusComments from '../components/GiscusComments.astro';
+import Prose from '../components/Prose.astro';
+import TagList from '../components/TagList.astro';
+import type { Entry } from '../lib/content';
+import { formatDate, getEntryHref } from '../lib/content';
+import { collectionMeta } from '../lib/site';
+
+interface Props {
+  entry: Entry;
+  Content: any;
+  components?: Record<string, any>;
+  previous?: Entry;
+  next?: Entry;
+}
+
+const { entry, Content, components, previous, next } = Astro.props;
+const meta = collectionMeta[entry.collection];
+---
+
+<article class="post-layout shell section-block">
+  <header class="post-hero">
+    <p class="eyebrow">{meta.label}</p>
+    <div class="post-hero__heading">
+      <h1>{entry.data.title}</h1>
+    </div>
+
+    <div class="post-hero__meta">
+      <span>发布于 {formatDate(entry.data.pubDate)}</span>
+      {entry.data.updatedDate && <span>更新于 {formatDate(entry.data.updatedDate)}</span>}
+    </div>
+  </header>
+
+  <section class="post-layout__body">
+    <Prose>
+      <Content components={components} />
+    </Prose>
+  </section>
+
+  <div class="post-layout__tags">
+    <TagList tags={entry.data.tags} collection={entry.collection} />
+  </div>
+
+  <nav class="post-pager">
+    {previous ? (
+      <a class="surface card-hover post-pager__item" href={getEntryHref(previous)}>
+        <span class="muted">上一篇</span>
+        <strong>{previous.data.title}</strong>
+      </a>
+    ) : (
+      <div></div>
+    )}
+
+    {next ? (
+      <a class="surface card-hover post-pager__item" href={getEntryHref(next)}>
+        <span class="muted">下一篇</span>
+        <strong>{next.data.title}</strong>
+      </a>
+    ) : (
+      <div></div>
+    )}
+  </nav>
+
+  <div class="post-layout__comments">
+    <GiscusComments />
+  </div>
+</article>
+
+<style>
+  .post-layout {
+    display: grid;
+    gap: 2rem;
+  }
+
+  .post-hero {
+    width: min(100%, 52rem);
+    margin: 0 auto;
+    display: grid;
+    gap: 0.8rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .post-hero__heading {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .post-hero h1 {
+    margin: 0;
+    font-family: var(--font-sans-zh);
+    font-size: clamp(1.55rem, 2.8vw, 2.1rem);
+    font-weight: 620;
+    line-height: 1.28;
+    letter-spacing: -0.02em;
+  }
+
+  .post-hero__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.85rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .post-layout__tags {
+    width: min(100%, var(--content-width));
+    margin: 0 auto;
+  }
+
+  .post-pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    width: min(100%, var(--surface-width));
+    margin: 0 auto;
+  }
+
+  .post-pager__item {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1.25rem;
+  }
+
+  .post-layout__comments {
+    width: min(100%, var(--surface-width));
+    margin: 0 auto;
+  }
+
+  @media (max-width: 720px) {
+    .post-pager {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

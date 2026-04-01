@@ -1,0 +1,162 @@
+---
+interface Props {
+  variant?: 'home' | 'about';
+  size?: 'xl' | 'lg' | 'md';
+  offsetX?: string;
+  offsetY?: string;
+  glowStrength?: number;
+  drift?: number;
+  crop?: boolean;
+}
+
+const {
+  variant = 'home',
+  size = variant === 'home' ? 'xl' : 'lg',
+  offsetX = variant === 'home' ? '-8%' : '-6%',
+  offsetY = variant === 'home' ? '-10%' : '-18%',
+  glowStrength = variant === 'home' ? 1 : 0.8,
+  drift = variant === 'home' ? 14 : 10,
+  crop = true,
+} = Astro.props;
+
+const sizes = {
+  xl: 'clamp(24rem, 44vw, 40rem)',
+  lg: 'clamp(20rem, 34vw, 30rem)',
+  md: 'clamp(16rem, 24vw, 22rem)',
+} as const;
+---
+
+<div
+  class:list={['moon-hero', `is-${variant}`, crop && 'is-cropped']}
+  style={`--moon-size:${sizes[size]};--moon-offset-x:${offsetX};--moon-offset-y:${offsetY};--moon-glow:${glowStrength};--moon-drift:${drift}px;`}
+>
+  <div class="moon-hero__halo"></div>
+  <div class="moon-hero__disc"></div>
+  <div class="moon-hero__mist"></div>
+</div>
+
+<style>
+  .moon-hero {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .moon-hero__halo,
+  .moon-hero__disc,
+  .moon-hero__mist {
+    position: absolute;
+    right: var(--moon-offset-x);
+    top: var(--moon-offset-y);
+    width: var(--moon-size);
+    aspect-ratio: 1;
+    border-radius: 50%;
+  }
+
+  .moon-hero__halo {
+    background:
+      radial-gradient(circle, rgba(238, 241, 245, calc(0.16 * var(--moon-glow))) 0%, rgba(216, 221, 228, calc(0.18 * var(--moon-glow))) 24%, rgba(186, 193, 203, calc(0.08 * var(--moon-glow))) 48%, rgba(186, 193, 203, 0) 72%);
+    filter: blur(34px);
+    transform: translate3d(0, 0, 0);
+    animation:
+      moon-drift 28s ease-in-out infinite alternate,
+      moon-glow 18s ease-in-out infinite alternate;
+  }
+
+  .moon-hero__disc {
+    overflow: hidden;
+    background:
+      radial-gradient(circle at 62% 38%, rgba(255, 255, 255, 0.18), transparent 22%),
+      radial-gradient(circle at 34% 72%, rgba(0, 0, 0, 0.12), transparent 38%),
+      radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.08));
+    box-shadow:
+      inset -2rem -2rem 4rem rgba(0, 0, 0, 0.22),
+      inset 1.1rem 1.4rem 2.2rem rgba(255, 255, 255, 0.12),
+      0 0 0 1px rgba(255, 255, 255, 0.06);
+    animation: moon-drift 28s ease-in-out infinite alternate;
+  }
+
+  .moon-hero__disc::before,
+  .moon-hero__disc::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+  }
+
+  .moon-hero__disc::before {
+    background-image: url('/textures/nasa-lroc-moon-2k.jpg');
+    background-size: 200% 100%;
+    background-position: 50% 50%;
+    background-repeat: no-repeat;
+    filter: saturate(0.9) contrast(1.06) brightness(0.98);
+  }
+
+  .moon-hero__disc::after {
+    background:
+      radial-gradient(circle at 38% 34%, rgba(255, 255, 255, 0.18), transparent 24%),
+      radial-gradient(circle at 72% 72%, rgba(0, 0, 0, 0.24), transparent 34%),
+      radial-gradient(circle at 50% 50%, transparent 64%, rgba(0, 0, 0, 0.12) 100%);
+    mix-blend-mode: soft-light;
+  }
+
+  .moon-hero__mist {
+    width: calc(var(--moon-size) * 1.2);
+    height: calc(var(--moon-size) * 0.72);
+    right: calc(var(--moon-offset-x) - 5%);
+    top: calc(var(--moon-offset-y) + 14%);
+    background:
+      radial-gradient(circle at 40% 46%, rgba(196, 202, 210, 0.08), transparent 34%),
+      radial-gradient(circle at 62% 58%, rgba(232, 235, 240, 0.06), transparent 28%);
+    filter: blur(42px);
+    border-radius: 999px;
+    animation: moon-drift 32s ease-in-out infinite alternate-reverse;
+  }
+
+  .moon-hero.is-about .moon-hero__mist {
+    top: calc(var(--moon-offset-y) + 18%);
+    opacity: 0.8;
+  }
+
+  @keyframes moon-drift {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+
+    100% {
+      transform: translate3d(calc(var(--moon-drift) * -0.35), var(--moon-drift), 0);
+    }
+  }
+
+  @keyframes moon-glow {
+    0% {
+      opacity: 0.6;
+    }
+
+    100% {
+      opacity: 0.9;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .moon-hero__halo,
+    .moon-hero__disc {
+      width: clamp(18rem, 54vw, 24rem);
+    }
+
+    .moon-hero__mist {
+      width: clamp(18rem, 58vw, 26rem);
+    }
+
+    .moon-hero.is-home {
+      --moon-offset-x: -18%;
+      --moon-offset-y: -6%;
+    }
+
+    .moon-hero.is-about {
+      --moon-offset-x: -14%;
+      --moon-offset-y: -10%;
+    }
+  }
+</style>

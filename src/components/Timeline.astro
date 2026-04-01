@@ -1,0 +1,61 @@
+---
+interface Item {
+  title: string;
+  description: string;
+}
+
+interface Props {
+  items: Item[];
+}
+
+const { items } = Astro.props;
+---
+
+<ol class="timeline">
+  {items.map((item) => (
+    <li>
+      <strong>{item.title}</strong>
+      <p>{item.description}</p>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .timeline {
+    margin: 2rem 0;
+    padding: 0 0 0 1.25rem;
+  }
+
+  .timeline li {
+    position: relative;
+    padding: 0 0 1.2rem 1rem;
+    list-style: none;
+    border-left: 1px solid var(--border-soft);
+  }
+
+  .timeline li::before {
+    content: '';
+    position: absolute;
+    top: 0.25rem;
+    left: -0.38rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: var(--accent-secondary);
+    box-shadow: 0 0 16px rgba(126, 240, 201, 0.4);
+  }
+
+  .timeline li:last-child {
+    padding-bottom: 0;
+  }
+
+  .timeline strong {
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .timeline p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+</style>

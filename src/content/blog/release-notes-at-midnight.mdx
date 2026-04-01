@@ -1,0 +1,57 @@
+---
+title: 深夜发布说明，不只是更新清单
+description: 一份好的发布说明，应该帮助读者恢复上下文，而不是制造又一份列表疲劳。
+pubDate: 2026-03-08
+tags:
+  - MDX
+  - Product Writing
+  - Communication
+draft: false
+cover: /images/cover-orbit.svg
+heroVariant: offset
+featured: false
+---
+
+import { Callout, ImageFrame, QuoteBlock, Timeline } from '../../components/MDXComponents';
+
+发布说明的核心任务，不是告诉人“我们做了很多事”，而是帮助读者快速判断：**这次更新与我有什么关系，它改变了什么，以及接下来我该做什么。**
+
+<Callout title="一个简单原则">
+  先写变化的意图，再写功能点本身。大多数读者理解一项变更，靠的不是字段名，而是上下文。
+</Callout>
+
+## 我更关心三件事
+
+<Timeline
+  items={[
+    { title: 'What changed', description: '描述事实，不要绕弯。' },
+    { title: 'Why now', description: '说明这次更新出现的时机和背景。' },
+    { title: 'What to do next', description: '把需要用户采取的动作写得明确。' },
+  ]}
+/>
+
+如果这三件事不完整，发布说明就很容易滑向“任务回执”。那种文本通常写给作者自己，而不是写给要接手变化的人。
+
+<QuoteBlock source="写作不是复述工作量，而是交付可理解性。">
+  深夜里的读者并不需要更多项目符号，他们需要的是一条清楚的线索，知道从哪里开始理解变化。
+</QuoteBlock>
+
+<ImageFrame
+  src="/images/cover-ridge.svg"
+  alt="抽象的蓝绿色渐变封面"
+  caption="当页面足够安静时，一张大图只需要承担气氛，而不是信息密度。"
+/>
+
+## MDX 的意义
+
+在这类文章里，MDX 不是为了把页面做得更像海报，而是为了在合适的位置插入更有结构的表达。像 `Callout`、`Timeline` 这种组件，能帮助读者在长文中快速重新定位。
+
+```ts
+const releaseShape = {
+  intent: '先说明为什么更新',
+  changes: ['核心变化', '兼容影响', '迁移方式'],
+  nextStep: '告诉读者接下来做什么',
+};
+```
+
+只要组件是克制的，MDX 就能成为内容表达的增强，而不是分散注意力的来源。

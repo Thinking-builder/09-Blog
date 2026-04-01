@@ -1,0 +1,23 @@
+<svg width="1600" height="960" viewBox="0 0 1600 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1600" height="960" fill="#0B1020"/>
+  <rect width="1600" height="960" fill="url(#paint0_radial)"/>
+  <rect x="180" y="160" width="1240" height="640" rx="48" fill="url(#paint1_linear)" fill-opacity="0.72" stroke="rgba(255,255,255,0.16)"/>
+  <g opacity="0.3">
+    <path d="M180 300H1420" stroke="#7C9BFF" stroke-opacity="0.5"/>
+    <path d="M180 440H1420" stroke="#7C9BFF" stroke-opacity="0.35"/>
+    <path d="M180 580H1420" stroke="#7C9BFF" stroke-opacity="0.25"/>
+    <path d="M400 160V800" stroke="#7EF0C9" stroke-opacity="0.22"/>
+    <path d="M800 160V800" stroke="#7EF0C9" stroke-opacity="0.18"/>
+    <path d="M1200 160V800" stroke="#7EF0C9" stroke-opacity="0.16"/>
+  </g>
+  <defs>
+    <radialGradient id="paint0_radial" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1120 180) rotate(131.531) scale(726.145 844.848)">
+      <stop stop-color="#7C9BFF" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#0B1020" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="paint1_linear" x1="180" y1="160" x2="1420" y2="800" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#121A30"/>
+      <stop offset="1" stop-color="#0B1020"/>
+    </linearGradient>
+  </defs>
+</svg>

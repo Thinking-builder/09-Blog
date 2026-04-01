@@ -1,0 +1,86 @@
+---
+interface Props {
+  variant?: 'default' | 'moon-hero';
+}
+
+const { variant = 'default' } = Astro.props;
+---
+
+<div class:list={['theme-backdrop', `is-${variant}`]} aria-hidden="true">
+  <div class="theme-backdrop__base"></div>
+  <div class="theme-backdrop__top-fog"></div>
+  <div class="theme-backdrop__haze theme-backdrop__haze--left"></div>
+  <div class="theme-backdrop__haze theme-backdrop__haze--right"></div>
+  <div class="theme-backdrop__vignette"></div>
+</div>
+
+<style>
+  .theme-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .theme-backdrop__base,
+  .theme-backdrop__top-fog,
+  .theme-backdrop__haze,
+  .theme-backdrop__vignette {
+    position: absolute;
+    inset: 0;
+  }
+
+  .theme-backdrop__base {
+    background:
+      radial-gradient(circle at 78% 12%, rgba(152, 160, 174, 0.08), transparent 18%),
+      radial-gradient(circle at 20% 12%, rgba(120, 128, 138, 0.04), transparent 16%),
+      linear-gradient(180deg, #060c14 0%, #0b121d 48%, #101723 100%);
+  }
+
+  .theme-backdrop__top-fog {
+    top: 0;
+    bottom: auto;
+    height: 24vh;
+    background:
+      linear-gradient(180deg, rgba(218, 223, 232, 0.04), rgba(218, 223, 232, 0.015) 34%, transparent 100%),
+      radial-gradient(ellipse at 50% 0%, rgba(205, 210, 220, 0.08), transparent 70%);
+    filter: blur(24px);
+    opacity: 0.9;
+  }
+
+  .theme-backdrop__haze {
+    filter: blur(52px);
+    opacity: 0.42;
+  }
+
+  .theme-backdrop__haze--left {
+    background:
+      radial-gradient(circle at 10% 24%, rgba(134, 142, 154, 0.08), transparent 26%);
+  }
+
+  .theme-backdrop__haze--right {
+    background:
+      radial-gradient(circle at 86% 10%, rgba(168, 176, 188, 0.1), transparent 24%);
+  }
+
+  .theme-backdrop__vignette {
+    background:
+      linear-gradient(180deg, rgba(4, 7, 15, 0.14), transparent 22%, rgba(4, 7, 15, 0.32) 100%),
+      linear-gradient(90deg, rgba(4, 7, 15, 0.16), transparent 22%, transparent 78%, rgba(4, 7, 15, 0.18));
+  }
+
+  .theme-backdrop.is-moon-hero .theme-backdrop__haze--right {
+    opacity: 0.62;
+    background:
+      radial-gradient(circle at 82% 10%, rgba(220, 225, 232, 0.14), transparent 18%),
+      radial-gradient(circle at 76% 14%, rgba(170, 178, 190, 0.12), transparent 24%);
+  }
+
+  .theme-backdrop.is-moon-hero .theme-backdrop__top-fog {
+    opacity: 1;
+    background:
+      linear-gradient(180deg, rgba(226, 230, 236, 0.05), rgba(226, 230, 236, 0.02) 34%, transparent 100%),
+      radial-gradient(ellipse at 58% 0%, rgba(214, 219, 228, 0.1), transparent 72%);
+  }
+</style>

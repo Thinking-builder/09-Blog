@@ -1,0 +1,503 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionTitle from '../components/SectionTitle.astro';
+import { getCategoryTagGroups, getPublishedEntries } from '../lib/content';
+import { collectionMeta, pageMeta, siteConfig } from '../lib/site';
+
+const blogEntries = await getPublishedEntries('blog');
+const essayEntries = await getPublishedEntries('essays');
+
+const scatterPresets = {
+  blog: [
+    { x: 16, y: 28 },
+    { x: 36, y: 18 },
+    { x: 58, y: 34 },
+    { x: 79, y: 22 },
+    { x: 24, y: 68 },
+    { x: 50, y: 58 },
+    { x: 76, y: 66 },
+    { x: 11, y: 48 },
+  ],
+  essays: [
+    { x: 19, y: 22 },
+    { x: 46, y: 34 },
+    { x: 73, y: 18 },
+    { x: 28, y: 63 },
+    { x: 58, y: 56 },
+    { x: 82, y: 68 },
+    { x: 8, y: 45 },
+    { x: 69, y: 42 },
+  ],
+} as const;
+
+const decorateGroups = (
+  collection: 'blog' | 'essays',
+  groups: ReturnType<typeof getCategoryTagGroups>,
+) =>
+  groups.map((group, index) => {
+    const preset = scatterPresets[collection][index % scatterPresets[collection].length];
+
+    return {
+      ...group,
+      x: preset.x,
+      y: preset.y,
+      scale: 1 + Math.min(group.count - 1, 3) * 0.12,
+      tone: index % 3,
+    };
+  });
+
+const groups = {
+  blog: decorateGroups('blog', getCategoryTagGroups('blog', blogEntries)),
+  essays: decorateGroups('essays', getCategoryTagGroups('essays', essayEntries)),
+};
+---
+
+<BaseLayout
+  title={`${pageMeta.categories.label} · ${siteConfig.title}`}
+  description={pageMeta.categories.description}
+>
+  <section class="shell section-block categories-page" data-categories-page>
+    <div class="categories-page__content" data-categories-content>
+      <SectionTitle
+        eyebrow="Categories"
+        title="分类导引"
+        description="把 Blog 与 Essays 的关键词拆成两张安静的散点网络。先从关键词进入，再从关键词回到文章。"
+      />
+
+      <div class="categories-grid">
+        {(['blog', 'essays'] as const).map((collection) => (
+          <section class="category-panel surface">
+            <div class="category-panel__header">
+              <p class="eyebrow">{collectionMeta[collection].label}</p>
+              <h2>{collectionMeta[collection].description}</h2>
+            </div>
+
+            <div class="category-network" aria-label={`${collectionMeta[collection].label} keyword network`}>
+              {groups[collection].map((group) => (
+                <button
+                  class:list={[
+                    'network-node',
+                    `is-tone-${group.tone}`,
+                  ]}
+                  type="button"
+                  data-category-node
+                  data-group={group.collection}
+                  data-tag={group.slug}
+                  style={`--x:${group.x}%; --y:${group.y}%; --scale:${group.scale};`}
+                >
+                  <span class="network-node__label">{group.label}</span>
+                  <span class="network-node__count">{group.count}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </div>
+
+    <div class="category-modal" data-category-modal hidden>
+      <button class="category-modal__backdrop" type="button" aria-label="关闭" data-category-close></button>
+
+      <div
+        class="category-modal__dialog surface"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="category-modal-title"
+      >
+        <div class="category-modal__header">
+          <div>
+            <p class="eyebrow" data-category-modal-group></p>
+            <h3 id="category-modal-title" data-category-modal-title></h3>
+            <p class="category-modal__meta" data-category-modal-meta></p>
+          </div>
+
+          <button class="category-modal__close" type="button" aria-label="关闭" data-category-close>
+            Close
+          </button>
+        </div>
+
+        <div class="category-modal__list" data-category-modal-list></div>
+      </div>
+    </div>
+  </section>
+
+  <script
+    is:inline
+    type="application/json"
+    id="categories-data"
+    set:html={JSON.stringify(groups)}
+  ></script>
+
+  <script is:inline>
+    const root = document.querySelector('[data-categories-page]');
+    const content = document.querySelector('[data-categories-content]');
+    const modal = document.querySelector('[data-category-modal]');
+    const titleEl = document.querySelector('[data-category-modal-title]');
+    const groupEl = document.querySelector('[data-category-modal-group]');
+    const metaEl = document.querySelector('[data-category-modal-meta]');
+    const listEl = document.querySelector('[data-category-modal-list]');
+    const dataEl = document.getElementById('categories-data');
+    const nodes = Array.from(document.querySelectorAll('[data-category-node]'));
+    const closeButtons = document.querySelectorAll('[data-category-close]');
+
+    if (root && content && modal && titleEl && groupEl && metaEl && listEl && dataEl) {
+      const data = JSON.parse(dataEl.textContent || '{}');
+      const labels = { blog: 'Blog', essays: 'Essays' };
+      const setActiveNode = (key) => {
+        nodes.forEach((node) => {
+          const nodeKey = `${node.dataset.group}:${node.dataset.tag}`;
+          const isActive = nodeKey === key;
+          node.classList.toggle('is-active', isActive);
+          node.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+      };
+
+      const clearUrl = (replace = false) => {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('group');
+        url.searchParams.delete('tag');
+        window.history[replace ? 'replaceState' : 'pushState']({}, '', url);
+      };
+
+      const syncUrl = (group, tag, replace = false) => {
+        const url = new URL(window.location.href);
+        url.searchParams.set('group', group);
+        url.searchParams.set('tag', tag);
+        window.history[replace ? 'replaceState' : 'pushState']({}, '', url);
+      };
+
+      const closeModal = (updateUrl = true) => {
+        root.classList.remove('is-modal-open');
+        modal.hidden = true;
+        listEl.innerHTML = '';
+        setActiveNode('');
+
+        if (updateUrl) {
+          clearUrl();
+        }
+      };
+
+      const openModal = (group, tag, updateUrl = true) => {
+        const record = (data[group] || []).find((item) => item.slug === tag);
+
+        if (!record) {
+          closeModal(updateUrl);
+          return;
+        }
+
+        groupEl.textContent = labels[group] || group;
+        titleEl.textContent = record.label;
+        metaEl.textContent = `共 ${record.count} 篇内容，按时间倒序排列`;
+        listEl.innerHTML = record.entries
+          .map(
+            (entry) => `
+              <a class="category-modal__item" href="${entry.href}">
+                <span class="category-modal__item-date">${entry.pubDate}</span>
+                <span class="category-modal__item-title">${entry.title}</span>
+                <span class="category-modal__item-collection">${labels[entry.collection] || entry.collection}</span>
+              </a>
+            `,
+          )
+          .join('');
+
+        modal.hidden = false;
+        root.classList.add('is-modal-open');
+        setActiveNode(`${group}:${tag}`);
+
+        if (updateUrl) {
+          syncUrl(group, tag);
+        }
+      };
+
+      const syncFromUrl = (replace = false) => {
+        const url = new URL(window.location.href);
+        const group = url.searchParams.get('group');
+        const tag = url.searchParams.get('tag');
+
+        if (!group || !tag || !data[group]) {
+          closeModal(false);
+          if (replace) {
+            clearUrl(true);
+          }
+          return;
+        }
+
+        openModal(group, tag, false);
+        if (replace) {
+          syncUrl(group, tag, true);
+        }
+      };
+
+      nodes.forEach((node) => {
+        node.addEventListener('click', () => {
+          openModal(node.dataset.group, node.dataset.tag);
+        });
+      });
+
+      closeButtons.forEach((button) => {
+        button.addEventListener('click', () => closeModal());
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.hidden) {
+          closeModal();
+        }
+      });
+
+      window.addEventListener('popstate', () => {
+        syncFromUrl(false);
+      });
+
+      syncFromUrl(true);
+    }
+  </script>
+</BaseLayout>
+
+<style>
+  .categories-page {
+    position: relative;
+  }
+
+  .categories-page__content {
+    transition:
+      filter 220ms ease,
+      opacity 220ms ease,
+      transform 220ms ease;
+  }
+
+  .categories-page.is-modal-open .categories-page__content {
+    filter: blur(14px);
+    opacity: 0.22;
+    transform: scale(0.992);
+    pointer-events: none;
+  }
+
+  .categories-grid {
+    display: grid;
+    gap: 1.35rem;
+  }
+
+  .category-panel {
+    padding: 1.55rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .category-panel__header {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 34rem);
+  }
+
+  .category-panel__header h2 {
+    margin: 0;
+    font-size: clamp(1.35rem, 2.5vw, 2rem);
+    line-height: 1.35;
+  }
+
+  .category-network {
+    position: relative;
+    min-height: 23rem;
+    margin-top: 1.4rem;
+    border-radius: 1.5rem;
+    background:
+      radial-gradient(circle at 16% 18%, rgba(228, 233, 240, 0.042), transparent 18%),
+      radial-gradient(circle at 78% 32%, rgba(228, 233, 240, 0.03), transparent 20%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.014), rgba(255, 255, 255, 0.008));
+  }
+
+  .network-node {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.42rem;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: rgba(234, 238, 244, 0.84);
+    cursor: pointer;
+    transform: translate(-50%, -50%) scale(var(--scale));
+    transition:
+      color 180ms ease,
+      text-shadow 180ms ease,
+      transform 180ms ease;
+  }
+
+  .network-node::before {
+    content: '';
+    position: absolute;
+    inset: -0.45rem -0.65rem;
+    border-radius: 999px;
+    background:
+      radial-gradient(ellipse at center, rgba(229, 235, 243, 0.065), rgba(229, 235, 243, 0.012) 60%, transparent 84%);
+    opacity: 0.32;
+    filter: blur(8px);
+    transition:
+      opacity 180ms ease,
+      filter 180ms ease;
+  }
+
+  .network-node:hover,
+  .network-node.is-active {
+    color: rgba(245, 247, 250, 0.94);
+    text-shadow: 0 0 12px rgba(236, 240, 246, 0.05);
+  }
+
+  .network-node:hover::before,
+  .network-node.is-active::before {
+    opacity: 0.8;
+    filter: blur(10px);
+  }
+
+  .network-node.is-active {
+    transform: translate(-50%, -50%) scale(calc(var(--scale) + 0.05));
+  }
+
+  .network-node__label {
+    font-family: var(--font-logo-en);
+    font-size: 1.18rem;
+    letter-spacing: 0.01em;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .network-node__count {
+    color: rgba(184, 194, 209, 0.76);
+    font-family: var(--font-nav-display);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+  }
+
+  .network-node.is-tone-1 .network-node__label {
+    font-family: var(--font-logo-zh);
+    font-size: 1.28rem;
+  }
+
+  .network-node.is-tone-2 .network-node__label {
+    font-family: var(--font-sans-en-display);
+    font-size: 1rem;
+    letter-spacing: -0.02em;
+  }
+
+  .category-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+  }
+
+  .category-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: rgba(4, 7, 13, 0.5);
+    cursor: pointer;
+  }
+
+  .category-modal__dialog {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: min(calc(100% - 2rem), 46rem);
+    max-height: min(80vh, 42rem);
+    padding: 1.35rem;
+    overflow: auto;
+    transform: translate(-50%, -50%);
+  }
+
+  .category-modal__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .category-modal__header h3 {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    letter-spacing: -0.04em;
+  }
+
+  .category-modal__meta {
+    margin: 0.55rem 0 0;
+    color: var(--text-secondary);
+  }
+
+  .category-modal__close {
+    border: 1px solid rgba(214, 220, 229, 0.12);
+    border-radius: 999px;
+    padding: 0.55rem 0.9rem;
+    background: rgba(255, 255, 255, 0.03);
+    color: rgba(232, 236, 243, 0.8);
+    font-family: var(--font-nav-display);
+    font-size: 0.74rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .category-modal__list {
+    display: grid;
+  }
+
+  .category-modal__item {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr) 5rem;
+    gap: 1rem;
+    align-items: center;
+    padding: 1rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .category-modal__item:first-child {
+    border-top: 0;
+  }
+
+  .category-modal__item-date,
+  .category-modal__item-collection {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+
+  .category-modal__item-title {
+    font-size: 1rem;
+  }
+
+  @media (max-width: 860px) {
+    .category-network {
+      min-height: 19rem;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .category-panel {
+      padding: 1.2rem;
+    }
+
+    .category-network {
+      min-height: 17rem;
+    }
+
+    .network-node__label,
+    .network-node.is-tone-1 .network-node__label,
+    .network-node.is-tone-2 .network-node__label {
+      font-size: 0.98rem;
+    }
+
+    .category-modal__dialog {
+      width: min(calc(100% - 1rem), 46rem);
+      padding: 1rem;
+    }
+
+    .category-modal__header {
+      flex-direction: column;
+    }
+
+    .category-modal__item {
+      grid-template-columns: 1fr;
+      gap: 0.45rem;
+    }
+  }
+</style>

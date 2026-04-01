@@ -1,0 +1,85 @@
+---
+const config = {
+  repo: import.meta.env.PUBLIC_GISCUS_REPO,
+  repoId: import.meta.env.PUBLIC_GISCUS_REPO_ID,
+  category: import.meta.env.PUBLIC_GISCUS_CATEGORY,
+  categoryId: import.meta.env.PUBLIC_GISCUS_CATEGORY_ID,
+  mapping: import.meta.env.PUBLIC_GISCUS_MAPPING ?? 'pathname',
+  strict: import.meta.env.PUBLIC_GISCUS_STRICT ?? '0',
+  reactionsEnabled: import.meta.env.PUBLIC_GISCUS_REACTIONS_ENABLED ?? '1',
+  emitMetadata: import.meta.env.PUBLIC_GISCUS_EMIT_METADATA ?? '0',
+  inputPosition: import.meta.env.PUBLIC_GISCUS_INPUT_POSITION ?? 'top',
+  theme: import.meta.env.PUBLIC_GISCUS_THEME ?? 'dark_dimmed',
+  lang: import.meta.env.PUBLIC_GISCUS_LANG ?? 'zh-CN',
+};
+
+const enabled = Boolean(
+  config.repo &&
+    config.repoId &&
+    config.category &&
+    config.categoryId,
+);
+---
+
+<section class="comments surface">
+  <div class="comments__header">
+    <p class="eyebrow">Discussion</p>
+    <h2>评论</h2>
+  </div>
+
+  {
+    enabled ? (
+      <div class="giscus"></div>
+    ) : (
+      <p class="comments__fallback muted">
+        Giscus 尚未配置。补齐 `.env` 中的 `PUBLIC_GISCUS_*` 变量后，评论区会自动启用。
+      </p>
+    )
+  }
+</section>
+
+{
+  enabled && (
+    <script
+      is:inline
+      define:vars={{ config }}
+    >
+      const script = document.createElement('script');
+      script.src = 'https://giscus.app/client.js';
+      script.async = true;
+      script.crossOrigin = 'anonymous';
+      script.setAttribute('data-repo', config.repo);
+      script.setAttribute('data-repo-id', config.repoId);
+      script.setAttribute('data-category', config.category);
+      script.setAttribute('data-category-id', config.categoryId);
+      script.setAttribute('data-mapping', config.mapping);
+      script.setAttribute('data-strict', config.strict);
+      script.setAttribute('data-reactions-enabled', config.reactionsEnabled);
+      script.setAttribute('data-emit-metadata', config.emitMetadata);
+      script.setAttribute('data-input-position', config.inputPosition);
+      script.setAttribute('data-theme', config.theme);
+      script.setAttribute('data-lang', config.lang);
+      document.currentScript?.previousElementSibling?.querySelector('.giscus')?.appendChild(script);
+    </script>
+  )
+}
+
+<style>
+  .comments {
+    padding: 1.4rem;
+  }
+
+  .comments__header {
+    margin-bottom: 1rem;
+  }
+
+  .comments__header h2 {
+    margin: 0;
+    font-family: var(--font-sans-en-display);
+    font-size: 1.6rem;
+  }
+
+  .comments__fallback {
+    margin: 0;
+  }
+</style>

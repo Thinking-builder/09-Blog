@@ -1,0 +1,44 @@
+---
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import ThemeBackdrop from '../components/ThemeBackdrop.astro';
+import { siteConfig } from '../lib/site';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  backgroundVariant?: 'default' | 'moon-hero';
+  showHeader?: boolean;
+  showFooter?: boolean;
+  pageClass?: string;
+}
+
+const {
+  title = siteConfig.title,
+  description = siteConfig.description,
+  backgroundVariant = 'default',
+  showHeader = true,
+  showFooter = true,
+  pageClass = '',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body class={pageClass}>
+    <ThemeBackdrop variant={backgroundVariant} />
+    {showHeader && <SiteHeader />}
+    <main>
+      <slot />
+    </main>
+    {showFooter && <SiteFooter />}
+  </body>
+</html>

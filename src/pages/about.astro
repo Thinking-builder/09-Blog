@@ -1,0 +1,101 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import MoonHero from '../components/MoonHero.astro';
+import Prose from '../components/Prose.astro';
+import { siteConfig } from '../lib/site';
+---
+
+<BaseLayout title={`About · ${siteConfig.title}`} description="关于这个博客与它的写作方式。" backgroundVariant="moon-hero">
+  <section class="shell section-block">
+    <header class="about-hero surface">
+      <div class="about-hero__visual">
+        <MoonHero variant="about" size="lg" offsetX="-10%" offsetY="-20%" glowStrength={0.82} drift={8} />
+      </div>
+      <div class="about-hero__copy">
+        <p class="eyebrow">About</p>
+        <h1>写作、维护与节奏</h1>
+        <p class="about-hero__description">
+          这是一个基于 Astro、Markdown/MDX 与 GitHub Pages 的静态博客。大月球只出现在首页与这里，其他页面尽量退回到安静的阅读背景。
+        </p>
+      </div>
+    </header>
+
+    <div class="surface about-surface">
+      <Prose>
+        <p>
+          这个博客被设计成一个适合长时间阅读的地方。页面信息密度被刻意压低，首页只承担“进入状态”的职责，真正的内容阅读发生在详情页里。
+        </p>
+        <p>
+          技术上，它使用 Astro 内容集合来管理 `blog` 与 `essays` 两类写作，并用单独的分类导引页把关键词重新组织起来。你可以继续用 Markdown 写常规文章，也可以用 MDX 混入自定义组件。
+        </p>
+        <p>
+          评论系统使用 Giscus，并通过环境变量配置。搜索、RSS、浅色主题与相关推荐目前保留扩展点，但不在本版实现范围内。
+        </p>
+      </Prose>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about-hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 24rem;
+    margin-bottom: 1.6rem;
+    padding: clamp(1.8rem, 4vw, 2.8rem);
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .about-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(90deg, rgba(6, 10, 20, 0.76) 0%, rgba(6, 10, 20, 0.54) 44%, rgba(6, 10, 20, 0.12) 72%, transparent 100%);
+  }
+
+  .about-hero__visual {
+    position: absolute;
+    inset: 0;
+  }
+
+  .about-hero__copy {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 32rem);
+    padding-left: 1rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .about-hero h1 {
+    margin: 0;
+    font-family: var(--font-sans-en-display);
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 0.98;
+    letter-spacing: -0.05em;
+  }
+
+  .about-hero__description {
+    margin: 1rem 0 0;
+    color: var(--text-secondary);
+    font-size: 1.02rem;
+    line-height: 1.9;
+  }
+
+  .about-surface {
+    padding: 1.4rem;
+  }
+
+  @media (max-width: 720px) {
+    .about-hero {
+      min-height: 20rem;
+      padding: 1.4rem;
+    }
+
+    .about-hero__copy {
+      width: 100%;
+      padding-left: 0.8rem;
+    }
+  }
+</style>

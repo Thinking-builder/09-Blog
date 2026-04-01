@@ -1,0 +1,16 @@
+---
+import HomeSeaMoon from '../components/HomeSeaMoon.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { siteConfig } from '../lib/site';
+---
+
+<BaseLayout
+  title={`${siteConfig.title} · ${siteConfig.homeTagline}`}
+  description={siteConfig.description}
+  backgroundVariant="default"
+  showHeader={false}
+  showFooter={false}
+  pageClass="home-entry-page"
+>
+  <HomeSeaMoon />
+</BaseLayout>
