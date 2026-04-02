@@ -16,11 +16,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -45,17 +42,21 @@ jobs:
             fi
           fi
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
+      - name: Install, build, and upload site
+        uses: withastro/action@v6
         with:
-          token: ${{ secrets.PAGES_DEPLOY_TOKEN != '' && secrets.PAGES_DEPLOY_TOKEN || github.token }}
-          enablement: ${{ secrets.PAGES_DEPLOY_TOKEN != '' }}
-
-      - name: Build and Deploy
-        id: deployment
-        uses: withastro/action@v5
-        with:
-          node-version: 22.12.0
+          node-version: 24
         env:
           SITE_URL: ${{ env.SITE_URL }}
           BASE_PATH: ${{ env.BASE_PATH }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
