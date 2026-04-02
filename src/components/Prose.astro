@@ -4,6 +4,11 @@
 
 <style>
   .prose {
+    --prose-strong: color-mix(in srgb, var(--accent-secondary) 82%, #f8efe0 18%);
+    --prose-link: color-mix(in srgb, #9fd6ff 68%, var(--accent-tertiary) 32%);
+    --prose-link-hover: color-mix(in srgb, #cce8ff 74%, var(--accent-tertiary) 26%);
+    --prose-link-underline: rgba(142, 192, 232, 0.46);
+    --prose-link-underline-hover: rgba(191, 228, 255, 0.74);
     width: min(100%, var(--content-width));
     margin: 0 auto;
     color: var(--text-primary);
@@ -39,16 +44,43 @@
     margin: 1.1rem 0;
   }
 
-  .prose a {
-    color: var(--accent-secondary);
+  .prose :global(a) {
+    color: var(--prose-link);
+    font-weight: 520;
     text-decoration: underline;
-    text-decoration-color: rgba(216, 191, 139, 0.38);
-    text-underline-offset: 0.18em;
+    text-decoration-color: var(--prose-link-underline);
+    text-decoration-thickness: 0.09em;
+    text-underline-offset: 0.2em;
+    transition:
+      color 180ms ease,
+      text-decoration-color 180ms ease,
+      text-shadow 180ms ease;
   }
 
-  .prose strong {
-    color: color-mix(in srgb, var(--accent-secondary) 72%, #fff 28%);
-    font-weight: 700;
+  .prose :global(a:hover) {
+    color: var(--prose-link-hover);
+    text-decoration-color: var(--prose-link-underline-hover);
+    text-shadow: 0 0 18px rgba(134, 194, 242, 0.18);
+  }
+
+  .prose :global(a:focus-visible) {
+    outline: 1px solid rgba(166, 214, 249, 0.52);
+    outline-offset: 0.22rem;
+    border-radius: 0.2rem;
+    color: var(--prose-link-hover);
+    text-decoration-color: var(--prose-link-underline-hover);
+  }
+
+  .prose :global(strong) {
+    color: var(--prose-strong);
+    font-weight: 760;
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 14px rgba(216, 191, 139, 0.12);
+  }
+
+  .prose :global(strong a),
+  .prose :global(a strong) {
+    color: inherit;
   }
 
   .prose figcaption {
@@ -70,6 +102,11 @@
   @media (max-width: 720px) {
     .prose {
       font-size: 1rem;
+    }
+
+    .prose :global(a) {
+      text-decoration-thickness: 0.08em;
+      text-underline-offset: 0.18em;
     }
   }
 </style>
